@@ -1,0 +1,57 @@
+/* styleing products page 
+
+*/
+
+.product-section {
+  position: relative;
+  top: 94px;
+}
+.filter-tab {
+  text-align: right;
+}
+.product-section .col {
+  height: 350px;
+  width: 250px;
+  display: inline-block;
+  /* border: 2px solid black; */
+  margin: 10px 25px;
+}
+.product-section .col .img img {
+  height: 280px;
+  width: 245px;
+}
+.product-section .products {
+  padding-top: 15px;
+  width: 90vw;
+  margin: auto;
+}
+.product-section .col:hover {
+  transform: translateY(-8px);
+}
+.product-section .products .product-price {
+  font-weight: bolder;
+}
+.product-section .product-details {
+  /* border: 2px solid black; */
+  text-align: center;
+}
+
+.product-section .products a {
+  text-decoration: none;
+  color: black;
+}
+.product-details .product-name {
+  margin-bottom: 10px;
+  font-weight: bolder;
+}
+.filter-tab .sort-title {
+  display: inline-block;
+}
+.filter-btn-l,
+.filter-btn-h {
+  height: 30px;
+  width: 180px;
+  background-color: white;
+  border-radius: 20px;
+  cursor: pointer;
+}
