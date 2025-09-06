@@ -1,267 +1,180 @@
-##############################
-# Global / Common
-##############################
+#VPC
 
-variable "project" {
-  description = "Project name for tagging and resource identification"
+variable "aws_region" {
+  description = "AWS region"
   type        = string
 }
 
-variable "environment" {
-  description = "Deployment environment (e.g., dev, uat, prod)"
+variable "vpc_name" {
+  description = "VPC name"
   type        = string
 }
-
-variable "region" {
-  description = "AWS region to deploy resources into"
-  type        = string
-}
-
-variable "tags" {
-  description = "A map of tags to apply to all resources"
-  type        = map(string)
-  default     = {}
-}
-
-##############################
-# VPC
-##############################
 
 variable "vpc_cidr" {
-  description = "CIDR block for the VPC"
+  description = "VPC CIDR block"
   type        = string
 }
 
-variable "public_subnets" {
-  description = "Public subnet definitions"
-  type = list(object({
-    cidr       = string
-    az         = string
-  }))
+variable "azs" {
+  description = "Availability Zones"
+  type        = list(string)
 }
 
-variable "private_subnets" {
-  description = "Private subnet definitions"
-  type = list(object({
-    cidr       = string
-    az         = string
-  }))
+variable "public_subnet_cidrs" {
+  description = "Public subnet CIDRs"
+  type        = list(string)
+}
+
+variable "private_subnet_cidrs" {
+  description = "Private subnet CIDRs"
+  type        = list(string)
+}
+
+variable "project" {
+  description = "Project name for tagging"
+  type        = string
+}
+
+variable "owner" {
+  description = "Owner of the resources"
+  type        = string
 }
 
 
-##############################
-# Security Groups
-##############################
 
+# Security groups (dynamic objects)
 variable "security_groups" {
-  description = "List of security groups with ingress and egress rules"
   type = list(object({
     name        = string
     description = string
-    vpc_id      = string
     ingress = list(object({
       from_port   = number
       to_port     = number
       protocol    = string
-      cidr_blocks = list(string)
+      cidr_blocks = optional(list(string))
+      source_sg   = optional(string)
     }))
     egress = list(object({
       from_port   = number
       to_port     = number
       protocol    = string
-      cidr_blocks = list(string)
+      cidr_blocks = optional(list(string))
+      source_sg   = optional(string)
     }))
   }))
 }
 
 
 
-
-##############################
-# EC2
-##############################
-
 variable "instances" {
-  description = "List of EC2 instance configurations (name, ami, instance_type, etc.)"
-  type        = list(object({
-    name          = string
-    ami           = string
-    instance_type = string
-    key_name      = string
-    volume_size   = number
-    tags          = map(string)
+  description = "EC2 instance configs"
+  type = list(object({
+    name           = string
+    ami_id         = string
+    instance_type  = string
+    subnet_index   = number
   }))
 }
 
-##############################
-# RDS
-##############################
-
-
-
-variable "db_identifier" {
-  description = "RDS instance identifier"
+variable "ec2_key_name" {
+  description = "Key pair name to use for EC2 instances"
   type        = string
 }
 
-variable "db_allocated_storage" {
-  description = "Allocated storage in GB"
-  type        = number
+
+
+variable "rds_cluster_identifier" {
+  type = string
+}
+variable "rds_engine_version" {
+  type = string
+}
+variable "rds_database_name" {
+  type = string
+}
+variable "rds_master_username" {
+  type = string
+}
+variable "rds_master_password" {
+  type      = string
+  sensitive = true
+}
+variable "rds_instance_class" {
+  type = string
 }
 
-variable "db_engine" {
-  description = "Database engine (e.g., mysql, postgres)"
-  type        = string
-}
 
-variable "db_engine_version" {
-  description = "Version of the database engine"
-  type        = string
-}
-
-variable "db_instance_class" {
-  description = "RDS instance class"
-  type        = string
-}
-
-variable "db_storage_encrypted" {
-  description = "Whether storage is encrypted"
-  type        = bool
-}
-
-variable "db_publicly_accessible" {
-  description = "Whether the DB is publicly accessible"
-  type        = bool
-}
-
-variable "db_delete_automated_backups" {
-  description = "Whether automated backups should be deleted"
-  type        = bool
-}
-
-variable "db_skip_final_snapshot" {
-  description = "Whether to skip final snapshot on DB deletion"
-  type        = bool
-}
-
-variable "db_name" {
-  description = "Initial database name"
-  type        = string
-}
-
-variable "db_username" {
-  description = "Master username for DB"
-  type        = string
-  sensitive   = true
-}
-
-variable "db_password" {
-  description = "Master password for DB"
-  type        = string
-  sensitive   = true
-}
-
-variable "db_apply_immediately" {
-  description = "Whether changes should be applied immediately"
-  type        = bool
-}
-
-variable "db_multi_az" {
-  description = "Enable multi-AZ deployment"
-  type        = bool
-}
-
-##############################
-# ECR
-##############################
-
-variable "ecr_repositories" {
-  description = "List of ECR repository names"
-  type        = list(string)
-}
-
-variable "ecr_scan_on_push" {
-  description = "Whether to enable scan on push for ECR repos"
+variable "rds_skip_final_snapshot" {
   type        = bool
   default     = true
 }
 
-variable "ecr_image_tag_mutability" {
-  description = "Image tag mutability (MUTABLE or IMMUTABLE)"
-  type        = string
-  default     = "MUTABLE"
+variable "rds_final_snapshot_identifier" {
+  type    = string
+  default = null
 }
 
-##############################
-# Elastic Beanstalk
-##############################
 
-variable "app_name" {
+variable "ecr_name" {
+  description = "ECR repository name"
+  type        = string
+}
+
+variable "ecr_image_tag_mutability" {
+  description = "Tag mutability (MUTABLE or IMMUTABLE)"
+  type        = string
+  default     = "IMMUTABLE"
+}
+
+variable "ecr_scan_on_push" {
+  description = "Enable scan on push"
+  type        = bool
+  default     = true
+}
+
+
+variable "bastion_ami" {
+  description = "AMI ID for bastion host"
+  type        = string
+}
+
+variable "bastion_instance_type" {
+  description = "Instance type for bastion host"
+  type        = string
+  default     = "t3.micro"
+}
+
+
+# Beanstalk Variables
+variable "myelasticapp" {
   description = "Elastic Beanstalk application name"
   type        = string
 }
 
-variable "app_description" {
-  description = "Elastic Beanstalk application description"
-  type        = string
-}
-
-variable "env_name" {
+variable "beanstalkappenv" {
   description = "Elastic Beanstalk environment name"
   type        = string
 }
 
 variable "solution_stack_name" {
-  description = "Elastic Beanstalk solution stack (e.g., Node.js, Python)"
+  description = "Elastic Beanstalk solution stack name"
   type        = string
 }
 
 variable "tier" {
   description = "Elastic Beanstalk environment tier (WebServer or Worker)"
   type        = string
-}
-
-variable "iam_instance_profile" {
-  description = "IAM instance profile for Elastic Beanstalk EC2 instances"
-  type        = string
-}
-
-variable "associate_public_ip" {
-  description = "Associate public IP to instances in Elastic Beanstalk"
-  type        = bool
-}
-
-variable "loadbalancer_type" {
-  description = "Load balancer type (application or classic)"
-  type        = string
-}
-
-variable "elb_scheme" {
-  description = "ELB scheme (internet facing or internal)"
-  type        = string
-}
-
-variable "min_size" {
-  description = "Minimum number of instances"
-  type        = number
-}
-
-variable "max_size" {
-  description = "Maximum number of instances"
-  type        = number
+  default     = "WebServer"
 }
 
 variable "instance_type" {
-  description = "EC2 instance type for Elastic Beanstalk environment"
+  description = "EC2 instance type for Beanstalk environment"
   type        = string
+  default     = "t2.medium"
 }
 
-variable "health_reporting" {
-  description = "Health reporting system type (basic or enhanced)"
+variable "iam_instance_profile" {
+  description = "IAM Instance profile for Beanstalk EC2 instances"
   type        = string
-}
-
-variable "http_matcher" {
-  description = "HTTP matcher code (e.g., 200)"
-  type        = string
+  default     = "aws-elasticbeanstalk-ec2-role"
 }

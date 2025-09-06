@@ -1,16 +1,9 @@
-output "osia_db_arn" {
-  value = aws_db_instance.osiadb1.arn
+output "cluster_endpoint" {
+  description = "Writer endpoint of the cluster"
+  value       = aws_rds_cluster.this.endpoint
 }
 
-output "osia_db_username" {
-  value = aws_db_instance.osiadb1.username
-}
-
-output "osia_db_password" {
-  value     = aws_db_instance.osiadb1.password
-  sensitive = true
-}
-
-output "osia_db_host" {
-  value = aws_db_instance.osiadb1.endpoint
+output "reader_endpoint" {
+  description = "Reader endpoint of the cluster"
+  value       = aws_rds_cluster.this.reader_endpoint
 }

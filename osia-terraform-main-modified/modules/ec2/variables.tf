@@ -1,24 +1,33 @@
-variable "ec2_subnet_id" {
-  description = "Subnet ID where EC2 instances will be launched"
-  type        = string
+variable "instances" {
+  description = "List of EC2 instances to create"
+  type = list(object({
+    name           = string
+    ami_id         = string
+    instance_type  = string
+    subnet_index   = number # which private subnet to place the instance in
+  }))
 }
 
-variable "security_group_ids" {
-  description = "List of Security Group IDs to attach to EC2 instances"
+variable "private_subnet_ids" {
+  description = "Private subnet IDs from VPC module"
   type        = list(string)
 }
 
-variable "instances" {
-  description = <<EOT
-List of EC2 instances to create.
-Each instance should have:
-  - name
-  - ami
-  - instance_type
-EOT
-  type = list(object({
-    name          = string
-    ami           = string
-    instance_type = string
-  }))
+variable "security_groups" {
+  description = "Map of security group IDs from SG module"
+  type        = map(string)
+}
+
+variable "project" {
+  type = string
+}
+
+variable "owner" {
+  type = string
+}
+
+
+variable "key_name" {
+  description = "SSH key pair name for EC2 login"
+  type        = string
 }

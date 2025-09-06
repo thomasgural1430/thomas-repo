@@ -1,41 +1,34 @@
-variable "project" {
-  description = "Project prefix for naming"
-  type        = string
-}
-
-variable "environment" {
-  description = "Environment name (e.g. dev, staging, prod)"
-  type        = string
-}
-
-variable "region" {
-  description = "AWS region"
+variable "vpc_name" {
+  description = "VPC name"
   type        = string
 }
 
 variable "vpc_cidr" {
-  description = "CIDR block for the VPC"
+  description = "VPC CIDR block"
   type        = string
 }
 
-variable "public_subnets" {
-  description = "List of public subnet definitions (cidr + az)"
-  type = list(object({
-    cidr = string
-    az   = string
-  }))
+variable "azs" {
+  description = "Availability Zones"
+  type        = list(string)
 }
 
-variable "private_subnets" {
-  description = "List of private subnet definitions (cidr + az)"
-  type = list(object({
-    cidr = string
-    az   = string
-  }))
+variable "public_subnet_cidrs" {
+  description = "Public subnet CIDRs"
+  type        = list(string)
 }
 
-variable "tags" {
-  description = "Common tags to apply to all resources"
-  type        = map(string)
-  default     = {}
+variable "private_subnet_cidrs" {
+  description = "Private subnet CIDRs"
+  type        = list(string)
+}
+
+variable "project" {
+  description = "Project name"
+  type        = string
+}
+
+variable "owner" {
+  description = "Resource owner"
+  type        = string
 }

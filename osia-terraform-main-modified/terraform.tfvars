@@ -1,71 +1,23 @@
+aws_region = "ap-south-1"
 
-##VPC Variables
+vpc_name = "osiav1-vpc"
+vpc_cidr = "10.0.0.0/16"
 
-project     = "osia"
-environment = "dev"
-region      = "eu-central-1"
-vpc_cidr    = "10.0.0.0/16"
+azs = ["ap-south-1a", "ap-south-1b"]
 
-public_subnets = [
-  { cidr = "10.0.0.0/26",  az = "eu-central-1a" },
-  { cidr = "10.0.0.64/26", az = "eu-central-1b" }
-]
+public_subnet_cidrs  = ["10.0.1.0/24", "10.0.2.0/24"]
+private_subnet_cidrs = ["10.0.3.0/24", "10.0.4.0/24"]
 
-private_subnets = [
-  { cidr = "10.0.0.128/26", az = "eu-central-1b" },
-  { cidr = "10.0.0.192/26", az = "eu-central-1c" }
-]
-
-tags = {
-  Environment = "dev"
-  Owner       = "Thomas"
-  Project     = "osia"
-}
-
-
-### Security Groups Variables
+project = "osiav1"
+owner   = "Random"
 
 
 
-
-
-
-####EC2 Variables
-
-instances = [
-  {
-    name          = "osia_ec2_be1"
-    ami           = "ami-05dd26907b8fa3fb5"
-    instance_type = "t3.large"
-    key_name      = "my-keypair"
-    volume_size   = 30
-    tags = {
-      Name = "osia_ec2_be1"
-    }
-  },
-  {
-    name          = "osia_ec2_be2"
-    ami           = "ami-05dd26907b8fa3fb5"
-    instance_type = "t3.medium"
-    key_name      = "my-keypair"
-    volume_size   = 20
-    tags = {
-      Name = "osia_ec2_be2"
-    }
-  }
-]
-
-
-
-
-
-#### security groups
 
 security_groups = [
   {
-    name        = "osia_fe_securitygroup"
-    description = "Frontend SG"
-    vpc_id      = "vpc-12345678"
+    name        = "web-sg"
+    description = "Allow web traffic"
     ingress = [
       { from_port = 22,  to_port = 22,  protocol = "tcp", cidr_blocks = ["0.0.0.0/0"] },
       { from_port = 80,  to_port = 80,  protocol = "tcp", cidr_blocks = ["0.0.0.0/0"] },
@@ -76,16 +28,42 @@ security_groups = [
     ]
   },
   {
-    name        = "osia_rds_securitygroup"
-    description = "RDS SG"
-    vpc_id      = "vpc-12345678"
+    name        = "db-sg"
+    description = "Allow MySQL only from web SG"
+    ingress = [
+      { from_port = 3306, to_port = 3306, protocol = "tcp", source_sg = "web-sg" },
+      { from_port = 3306, to_port = 3306, protocol = "tcp", source_sg = "private-ec2-sg" }
+    ]
+    egress = [
+      { from_port = 0, to_port = 0, protocol = "-1", cidr_blocks = ["0.0.0.0/0"] }
+    ]
+  },
+  {
+    name        = "bastion-sg"
+    description = "Allow SSH from my public IP"
     ingress = [
       {
-        from_port   = 3306
-        to_port     = 3306
+        from_port   = 22
+        to_port     = 22
         protocol    = "tcp"
-        cidr_blocks = ["10.0.0.0/16"] # 👈 add CIDR(s) allowed to access RDS
+        cidr_blocks = ["103.135.62.208/32"] # replace with your IP
       }
+    ]
+    egress = [
+      {
+        from_port   = 0
+        to_port     = 0
+        protocol    = "-1"
+        cidr_blocks = ["0.0.0.0/0"]
+      }
+    ]
+  },
+  {
+    name        = "private-ec2-sg"
+    description = "Allow all traffic from DB SG"
+    ingress = [
+      { from_port = 0, to_port = 0, protocol = "-1", source_sg = "db-sg" },
+      { from_port = 22, to_port = 22, protocol = "tcp", source_sg = "bastion-sg" }
     ]
     egress = [
       { from_port = 0, to_port = 0, protocol = "-1", cidr_blocks = ["0.0.0.0/0"] }
@@ -96,55 +74,40 @@ security_groups = [
 
 
 
+# EC2 private Instances (1 in each private subnet)
+instances = [
+  { name = "osiav1-ec2-1", ami_id = "ami-02d26659fd82cf299", instance_type = "t3.micro", subnet_index = 0 },
+  { name = "osiav1-ec2-2", ami_id = "ami-02d26659fd82cf299", instance_type = "t3.micro", subnet_index = 1 }
+]
+ec2_key_name = "osiav1-key"
 
-###RDS Variables
+##bastion
 
-# RDS
-db_identifier               = "osiadb1"
-db_allocated_storage        = 20
-db_engine                   = "postgres"
-db_engine_version           = "15.12"
-db_instance_class           = "db.t3.micro"
-db_storage_encrypted        = false
-db_publicly_accessible      = true
-db_delete_automated_backups = true
-db_skip_final_snapshot      = true
-db_name                     = "osia_db1"
-db_username                 = "osia_db_admin"
-db_password                 = "SuperSecretPass123!"
-db_apply_immediately        = true
-db_multi_az                 = false
+bastion_ami           = "ami-02d26659fd82cf299" # Example Amazon Linux 2 (ap-south-1)
+bastion_instance_type = "t3.micro"
 
 
 
-
-###ECR Variables
-
-# ECR
-ecr_repositories         = ["osia-ecr-fe", "osia-ecr-be"]
+ecr_name                 = "osiav1-app-repo"
+ecr_image_tag_mutability = "IMMUTABLE"
 ecr_scan_on_push         = true
-ecr_image_tag_mutability = "MUTABLE"
+
+
+##RDS
+
+rds_cluster_identifier = "osiav1-aurora-cluster"
+rds_engine_version     = "15.3"
+rds_database_name      = "osiav1db"
+rds_master_username    = "adminuser"
+rds_master_password    = "SuperSecretPass123"
+rds_instance_class     = "db.r6g.large"
+rds_skip_final_snapshot = true
 
 
 
-
-###beanstalk
-
-app_name        = "OsiaWebApp"
-app_description = "Osia Elastic Beanstalk App"
-env_name        = "osia-env1"
-
-solution_stack_name = "64bit Amazon Linux 2023 v6.6.1 running Node.js 22"
-tier                = "WebServer"
-
-iam_instance_profile = "aws-elasticbeanstalk-ec2-role"
-associate_public_ip  = "true"
-loadbalancer_type    = "application"
-elb_scheme           = "internet facing"
-
-min_size      = 1
-max_size      = 3
-instance_type = "t3.medium"
-
-health_reporting = "enhanced"
-http_matcher     = "200"
+# Beanstalk
+myelasticapp         = "osiav1-eb-app"
+beanstalkappenv      = "osiav1-eb-env"
+solution_stack_name  = "64bit Amazon Linux 2 v3.9.4 running Corretto 17"
+tier                 = "WebServer"
+instance_type        = "t2.medium"

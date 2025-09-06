@@ -1,72 +1,72 @@
-variable "db_identifier" {
-  type = string
+variable "cluster_identifier" {
+  description = "Aurora cluster identifier"
+  type        = string
 }
 
-variable "db_allocated_storage" {
-  type = number
+variable "engine" {
+  description = "Aurora engine"
+  type        = string
+  default     = "aurora-postgresql"
 }
 
-variable "db_engine" {
-  type    = string
-  default = "postgres"
+variable "engine_version" {
+  description = "Aurora engine version"
+  type        = string
 }
 
-variable "db_engine_version" {
-  type    = string
-  default = "15.12"
+variable "database_name" {
+  description = "Initial database name"
+  type        = string
 }
 
-variable "db_instance_class" {
-  type = string
+variable "master_username" {
+  description = "Master username"
+  type        = string
 }
 
-variable "db_storage_encrypted" {
-  type    = bool
-  default = false
+variable "master_password" {
+  description = "Master password"
+  type        = string
+  sensitive   = true
 }
 
-variable "db_publicly_accessible" {
-  type    = bool
-  default = true
+variable "instance_class" {
+  description = "Aurora instance class"
+  type        = string
 }
 
-variable "db_delete_automated_backups" {
-  type    = bool
-  default = true
+variable "subnet_ids" {
+  description = "Private subnet IDs"
+  type        = list(string)
 }
 
-variable "db_skip_final_snapshot" {
-  type    = bool
-  default = true
-}
-
-variable "db_name" {
-  type = string
-}
-
-variable "db_username" {
-  type = string
-}
-
-variable "db_password" {
-  type      = string
-  sensitive = true
-}
-
-variable "db_apply_immediately" {
-  type    = bool
-  default = true
-}
-
-variable "db_multi_az" {
-  type    = bool
-  default = false
-}
-
-variable "db_subnet_group_name" {
-  type = string
+variable "vpc_id" {
+  description = "VPC ID"
+  type        = string
 }
 
 variable "security_group_ids" {
-  type = list(string)
+  description = "Security groups for RDS cluster"
+  type        = list(string)
 }
+
+variable "project" {
+  type = string
+}
+
+variable "owner" {
+  type = string
+}
+
+variable "skip_final_snapshot" {
+  description = "Whether to skip creating a final snapshot on cluster deletion"
+  type        = bool
+  default     = true
+}
+
+variable "final_snapshot_identifier" {
+  description = "Final snapshot identifier if skip_final_snapshot is false"
+  type        = string
+  default     = null
+}
+

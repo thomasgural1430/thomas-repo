@@ -1,74 +1,42 @@
-variable "app_name" {
-  type = string
+variable "myelasticapp" {
+  description = "Elastic Beanstalk application name"
+  type        = string
 }
 
-variable "app_description" {
-  type = string
-  default = "Osia web application"
-}
-
-variable "env_name" {
-  type = string
+variable "beanstalkappenv" {
+  description = "Elastic Beanstalk environment name"
+  type        = string
 }
 
 variable "solution_stack_name" {
-  type = string
+  description = "Elastic Beanstalk solution stack name"
+  type        = string
 }
 
 variable "tier" {
-  type    = string
-  default = "WebServer"
+  description = "Elastic Beanstalk environment tier (WebServer or Worker)"
+  type        = string
+  default     = "WebServer"
 }
 
 variable "vpc_id" {
-  type = string
+  description = "VPC ID where Beanstalk environment will be launched"
+  type        = string
 }
 
-variable "subnet_ids" {
-  type = list(string)
-}
-
-variable "iam_instance_profile" {
-  type = string
-  default = "aws-elasticbeanstalk-ec2-role"
-}
-
-variable "associate_public_ip" {
-  type    = string
-  default = "True"
-}
-
-variable "loadbalancer_type" {
-  type    = string
-  default = "application"
-}
-
-variable "elb_scheme" {
-  type    = string
-  default = "internet facing"
-}
-
-variable "min_size" {
-  type    = number
-  default = 1
-}
-
-variable "max_size" {
-  type    = number
-  default = 2
+variable "public_subnets" {
+  description = "List of public subnet IDs for Beanstalk environment"
+  type        = list(string)
 }
 
 variable "instance_type" {
-  type    = string
-  default = "t2.medium"
+  description = "EC2 instance type for Beanstalk environment"
+  type        = string
+  default     = "t2.medium"
 }
 
-variable "health_reporting" {
-  type    = string
-  default = "enhanced"
-}
-
-variable "http_matcher" {
-  type    = string
-  default = "200"
+variable "iam_instance_profile" {
+  description = "IAM Instance profile for Beanstalk EC2 instances"
+  type        = string
+  default     = "aws-elasticbeanstalk-ec2-role"
 }

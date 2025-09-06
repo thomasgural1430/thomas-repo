@@ -1,12 +1,13 @@
 resource "aws_ecr_repository" "this" {
-  for_each = toset(var.repositories)
-
-  name = each.value
+  name                 = var.name
+  image_tag_mutability = var.image_tag_mutability
 
   image_scanning_configuration {
     scan_on_push = var.scan_on_push
   }
 
-  image_tag_mutability = var.image_tag_mutability
+  tags = {
+    Project = var.project
+    Owner   = var.owner
+  }
 }
-
