@@ -25,7 +25,7 @@ resource "aws_rds_cluster" "this" {
   }
 }
 
-# Writer instance (private subnet 1)
+
 resource "aws_rds_cluster_instance" "writer" {
   identifier         = "${var.cluster_identifier}-writer"
   cluster_identifier = aws_rds_cluster.this.id
@@ -36,8 +36,9 @@ resource "aws_rds_cluster_instance" "writer" {
   db_subnet_group_name = aws_db_subnet_group.this.name
 }
 
-# Reader instance (private subnet 2)
+
 resource "aws_rds_cluster_instance" "reader" {
+  count              = var.create_reader ? var.reader_count : 0
   identifier         = "${var.cluster_identifier}-reader"
   cluster_identifier = aws_rds_cluster.this.id
   instance_class     = var.instance_class

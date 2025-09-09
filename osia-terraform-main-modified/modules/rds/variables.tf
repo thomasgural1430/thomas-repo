@@ -70,3 +70,14 @@ variable "final_snapshot_identifier" {
   default     = null
 }
 
+variable "create_reader" {
+  description = "Whether to create a reader instance"
+  type        = bool
+  default     = false
+}
+
+variable "reader_count" {
+  description = "Number of reader instances to create (if enabled)"
+  type        = number
+  default     = 1
+}

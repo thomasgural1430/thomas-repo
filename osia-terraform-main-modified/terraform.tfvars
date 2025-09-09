@@ -1,9 +1,9 @@
-aws_region = "ap-south-1"
+aws_region = "eu-central-1"
 
 vpc_name = "osiav1-vpc"
 vpc_cidr = "10.0.0.0/16"
 
-azs = ["ap-south-1a", "ap-south-1b"]
+azs = ["eu-central-1a", "eu-central-1b"]
 
 public_subnet_cidrs  = ["10.0.1.0/24", "10.0.2.0/24"]
 private_subnet_cidrs = ["10.0.3.0/24", "10.0.4.0/24"]
@@ -83,7 +83,7 @@ ec2_key_name = "osiav1-key"
 
 ##bastion
 
-bastion_ami           = "ami-02d26659fd82cf299" # Example Amazon Linux 2 (ap-south-1)
+bastion_ami           = "ami-02d26659fd82cf299" 
 bastion_instance_type = "t3.micro"
 
 
@@ -100,8 +100,10 @@ rds_engine_version     = "15.3"
 rds_database_name      = "osiav1db"
 rds_master_username    = "adminuser"
 rds_master_password    = "SuperSecretPass123"
-rds_instance_class     = "db.r6g.large"
+rds_instance_class     = "db.r6g.medium"
 rds_skip_final_snapshot = true
+create_reader = false
+reader_count  = 0
 
 
 

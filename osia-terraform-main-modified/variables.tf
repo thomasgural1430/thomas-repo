@@ -115,6 +115,19 @@ variable "rds_final_snapshot_identifier" {
 }
 
 
+# Reader configuration
+variable "create_reader" {
+  description = "Whether to create a reader instance"
+  type        = bool
+  default     = false
+}
+
+variable "reader_count" {
+  description = "Number of reader instances to create (if enabled)"
+  type        = number
+  default     = 1
+}
+
 variable "ecr_name" {
   description = "ECR repository name"
   type        = string
